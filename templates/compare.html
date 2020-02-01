@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ u1.name }} vs {{ u2.name }} - Repl Talk{% endblock %}
+{% block body %}
+<h1>
+	<a href="{{ u1.url }}" style="text-decoration: none;">{{ u1.name }}</a> ({{ u1.cycles }}) vs 
+	<a href="{{ u2.url }}" style="text-decoration: none;">{{ u2.name }}</a> ({{ u2.cycles }})
+</h1>
+<div class="avatar" style='background-image:url("{{u1.avatar}}")'></div>
+<div class="avatar" style='background-image:url("{{u2.avatar}}")'></div>
+{% set start_time = (history[0].time - epoch).total_seconds() %}
+{% set end_time = (history[-1].time - epoch).total_seconds() %}
+
+{% set max_cycles = [u1.cycles,u2.cycles]|max+10 %}
+{% set min_cycles = max_cycles %}
+{% for hist in history %}
+	{% if u1.name in hist.leaders %}
+		{% if hist.leaders[u1.name] < min_cycles %}
+			{% set min_cycles = hist.leaders[u1.name] %}
+		{% endif %}
+	{% endif %}
+	{% if u2.name in hist.leaders %}
+		{% if hist.leaders[u2.name] < min_cycles %}
+			{% set min_cycles = hist.leaders[u2.name] %}
+		{% endif %}
+	{% endif %}
+{% endfor %}
+
+{% set divide = 5000.0 %}
+
+<h3>Previous cycle history:</h3>
+<p>
+	<span style="color:#f0f">{{ u1.name }}</span> vs <span style="color:#0ff">{{ u2.name }}</span>
+</p>
+<oof>{{min_cycles}}</oof>
+<svg height="{{(max_cycles-min_cycles)+10}}" width="{{((history|length)*10)+20}}">
+	{% for i in range(1, history|count) %}
+		{% set h = history[i] %}
+		{% if u1.name in history[i-1].leaders %}
+			{% set cycles1 = h.leaders[u1.name] %}
+			{% set cycles1_before = history[i-1].leaders[u1.name] %}
+			
+			{% set u1_x1 = (((history[i-1].time - epoch).total_seconds() - start_time) / divide) + 10 %}
+			{% set u1_y1 = max_cycles-cycles1_before %}
+			{% set u1_x2 = (((history[i].time - epoch).total_seconds() - start_time) / divide) + 10 %}
+			{% set u1_y2 = max_cycles-cycles1 %}
+
+			<line x1="{{u1_x1}}" y1="{{u1_y1}}" x2="{{u1_x2}}" y2="{{u1_y2}}" style="stroke:#f0f;stroke-width:2" />
+		{% endif %}
+		
+		{% if u2.name in history[i-1].leaders %}
+			{% set cycles2 = h.leaders[u2.name] %}
+			{% set cycles2_before = history[i-1].leaders[u2.name] %}
+			{% set u2_x1 = (((history[i-1].time - epoch).total_seconds() - start_time) / divide) + 10 %}
+			{% set u2_y1 = max_cycles-cycles2_before %}
+			{% set u2_x2 = (((history[i].time - epoch).total_seconds() - start_time) / divide) + 10 %}
+			{% set u2_y2 = max_cycles-cycles2 %}
+
+			<line x1="{{u2_x1}}" y1="{{u2_y1}}" x2="{{u2_x2}}" y2="{{u2_y2}}" style="stroke:#0ff;stroke-width:2" />
+		{% endif %}
+
+	{% endfor %}
+</svg>
+{% endblock %}

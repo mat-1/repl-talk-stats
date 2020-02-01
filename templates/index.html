@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Repl Talk Stats{% endblock %}
+{% block body %}
+<h1 style="text-align:center">Repl Talk Leaderboard</h1>
+<div id="leaders">
+{% for u in leaderboard %}
+<div class="leader">
+<p class="username">{{ u.name }}<br>({{u.cycles}})</p>
+<a href="/user/{{u.name}}" name="{{u.name}}"><div class="avatar center" style='background-image: url("{{u.avatar}}");'></div></a>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

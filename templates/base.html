@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% block head %}
+	<title>{% block title %}???{% endblock %}</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="View previous cycle histories from Repl Talk users">
+	<meta name="keywords" content="replit,repltalk,repl talk">
+	<meta name="language" content="English">
+	<meta http-equiv="content-language" content="en">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="/main.css">
+	<link rel="icon" href="{% block favicon %}/favicon.png{% endblock %}" type="image/png">
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script>
+	$("a").click(function() {
+	var $this = $(this),
+			href = $this.attr("href");
+
+	$(document.body).load(href);
+
+	location.href = "#" + href;
+	});
+	</script>
+	{% endblock %}
+</head>
+<body>
+	<div id="content" name="content">
+	{% block body %}
+	<p>Nothing here yet. Come back soon!</p>
+	{% endblock %}
+	</div>
+</body>
+</html>
