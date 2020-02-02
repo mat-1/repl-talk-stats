@@ -4,10 +4,11 @@
 <h1><a href="{{ u.url }}" style="text-decoration: none;">{{ u.name }}</a> ({{ u.cycles }})</h1>
 <div class="avatar" style='background-image:url("{{u.avatar}}")'></div>
 {% set start_time = (history[0].time - epoch).total_seconds() %}
-{% set end_time = (history[-1].time - epoch).total_seconds() %}
+{% set end_time = (history[-1].time - epoch).total_seconds()+1 %}
 {% set max_cycles = u.cycles+10 %}
 
-{% set max_y = {'value': 0} %}
+
+{% set max_y = {'value': 1} %}
 {% set points = [] %}
 {% for timeframe in history %}
 	{% set timeframe_time = (timeframe.time - epoch).total_seconds() %}
@@ -20,18 +21,26 @@
 		{% if max_y.update({'value': y}) %}{% endif %}
 	{% endif %}
 {% endfor %}
+{% set max_y = max_y.value %}
 <h3>Previous cycle history:</h3>
-<svg viewBox="0 0 100 {{ max_y.value }}" preserveAspectRatio="none" class="graph-svg" width="100%" height="100%">
-	<path d="
-	{% for i in range(1, points|length) %}
-		{% set h = points[i-1] %}
-		{% set h2 = points[i] %}
-		{% if i == 1 %}
-			M{{ h[0] }},{{ h[1] }}
-		{% else %}
-			L{{ h2[0] }},{{ h2[1] }}
-		{% endif %}
-	{% endfor %}
-	" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke">
-</svg>
+<div class="graph-container">
+	<svg viewBox="0 0 100 100" class="graph-svg" width="100%" height="100%" preserveAspectRatio="none">
+		<path d="
+		{% for i in range(1, points|length) %}
+			{% set h = points[i-1] %}
+			{% set h2 = points[i] %}
+			{% if i == 1 %}
+				M{{ h[0] }},{{ (h[1]/max_y)*100|int }}
+			{% else %}
+				L{{ h2[0] }},{{ (h2[1]/max_y)*100|int }}
+			{% endif %}
+		{% endfor %}
+		" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+	</svg>
+	<svg class="text-svg" viewBox="0 0 100 100" height="100%" width="8em" preserveAspectRatio="xMinYMax meet">
+		<text x="5" y="95" class="marker">
+			{{ history[0].time.strftime('%m-%d-%Y') }}
+		</text>
+	</svg>
+</div>
 {% endblock %}

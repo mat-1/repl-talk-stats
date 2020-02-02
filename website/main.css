@@ -52,9 +52,27 @@ a {
 svg {
 	stroke-linejoin: round;
 }
-.graph-svg {
+.graph-container {
 	min-height: calc(100vh - 16em);
 	border: 2px solid rgba(255,255,255,0.1);
 	border-radius: 1em;
 	height: 10em;
+	overflow: hidden
+}
+.graph-svg .marker {
+	fill: #fff
+}
+.graph-container svg {
+	position: relative;
+	
+	/*! top: 0; */
+	/* border: 1px solid red; */
+}
+.text-svg {
+	bottom: calc(100% + 5px);
+	fill: #fff;
+/* 	border: 1px solid red */
+}
+.marker {
+	/*! font-size: 0.5em */
 }

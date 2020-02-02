@@ -36,20 +36,30 @@ class cache:
 	prev_leaders = {}
 
 	website = {}
-	
-async def get_leaderboard():
-	leaderboard = await client.get_leaderboard(60)
+
+
+# leaderboard_players being a multiple of 30 is better
+leaderboard_players = 300
+
+display_leaderboard_players = 100
+
+async def get_leaderboard(from_database=True):
+	if from_database:
+		leaderboard = await db.get_leaders(display_leaderboard_players)
+	else:
+		leaderboard = await client.get_leaderboard(leaderboard_players)
 	return leaderboard
 	
 async def update_database():
-	leaderboard = await client.get_leaderboard(60)
+	leaderboard = await get_leaderboard(from_database=False)
 	
 	new_leaders = []
 	for position, user in enumerate(leaderboard):
 		new_leaders.append({
 			'_id': user.name,
 			'position': position,
-			'cycles': user.cycles
+			'cycles': user.cycles,
+			'avatar': user.avatar
 		})
 	await db.add_leaders(new_leaders)
 	return leaderboard

@@ -27,6 +27,10 @@ class Database():
 		t = datetime.now()
 		for leader_data in leaders:
 			data = {
+				'$set': {
+					'cycles': leader_data['cycles'],
+					'avatar': leader_data['avatar']
+				},
 				'$push': {
 					'history': {
 						'time': t,
@@ -48,26 +52,18 @@ class Database():
 		data = await repltalk_data.find_one({'_id': name})
 		if not data: return
 		return data['history']
-	'''async def fix(self):
-		prev_leaders = await self.get_previous_leaders()
-		l_before = {'leaders':{}}
-		prev_leaders_tmp = list(prev_leaders)
-		i=len(prev_leaders)
-		print('fixing leaderboards')
-		for l in reversed(prev_leaders_tmp):
-			if l['leaders'] == l_before['leaders']:
-				print(i)
-				del prev_leaders[i-1]
-				print('deleted',i-1)
-			l_before = l
-			i-=1
-		for l in reversed(prev_leaders_tmp):
-			for u in l['leaders']:
-				print(i)
-				del prev_leaders[i-1]
-				print('deleted',i-1)
-			l_before = l
-			i-=1
-		await repltalk_data.update_one({'_id': 'leaderboard'}, {'$set':{'history':prev_leaders}})'''
+	async def get_leaders(self, limit=100):
+		leaders = []
+		async for leader in repltalk_data.find({}).sort('cycles', -1).limit(limit):
+			if 'cycles' not in leader: continue
+			cycles = leader['cycles']
+			username = leader['_id']
+			avatar = leader['avatar']
+			leaders.append({
+				'cycles': cycles,
+				'name': username,
+				'avatar': avatar
+			})
+		return leaders
 
 db = Database()
